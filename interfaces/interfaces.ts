@@ -1,4 +1,12 @@
-interface background{
-    ranges:number[];
-    tile:string;
+interface level{
+    backgrounds: [
+        {
+            tile:string,
+            ranges: [
+                [
+                    number,number,
+                    number,number
+                ]
+            ]
+        },
 }

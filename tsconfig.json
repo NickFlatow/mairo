@@ -44,8 +44,11 @@
 	"node_modules"
   ],
   "files": [
+	"src/Compositor.ts",
+	"src/layers.ts",
 	"src/loaders.ts",
     "src/main.ts",
+	"src/sprites.ts",
     "src/SpriteSheet.ts",
 	"interfaces/interfaces.ts"
   ],

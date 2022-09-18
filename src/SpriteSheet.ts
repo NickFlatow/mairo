@@ -1,12 +1,7 @@
+/**
+ * Methods to crop subset of image(sprite) from spritesheet and render the selected sprite on to canvas
+ */
 class SpriteSheet {
-    /*
-    context.drawImage(image,
-        0,0, //location to start on sprite sheet (upper left corner)
-        16,16, //area to crop on sprite sheet
-        16,16, //location of image on canvas
-        16,16);//size of image on canvas (strech or shrink)
-    */
-
     image:CanvasImageSource;
     width:number;
     height:number;
@@ -17,22 +12,29 @@ class SpriteSheet {
         this.height = height;
         this.tiles = new Map<string,HTMLCanvasElement>();
     }
-    //don't draw from tiles.png everytime
-    //lets create a buffer to store the images of each kind(brick,sky,water...etc)
-    define(name:string,x:number,y:number):void{
+    //don't draw from spritesheet everytime
+    //lets create a buffer to store the images of each kind crop to specific item we want(brick,sky,water,mario...etc)
+    define(name:string,sx:number,sy:number,sWidth:number,sHeight:number):void{
         const buffer = document.createElement('canvas') as HTMLCanvasElement;
-        buffer.width = this.width
-        buffer.height = this.height;
+        buffer.width = sWidth
+        buffer.height = sHeight;
+        // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
         buffer.getContext('2d').drawImage(this.image,
-                                          x * this.width, 
-                                          y * this.height, 
-                                          this.width,this.height,
-                                          0,0,
-                                          this.width,this.height);
+                                          sx, 
+                                          sy, 
+                                          sWidth,
+                                          sHeight,
+                                          0,
+                                          0,
+                                          sWidth,
+                                          sHeight);
 
         //save the new canvas element in a map for fast lookup when drawing the level
         this.tiles.set(name,buffer);
         
+    }
+    defineTile(name:string,sx:number,sy:number){
+        this.define(name,sx * this.width, sy* this.width,this.width,this.height);
     }
     draw(name:string,context:CanvasRenderingContext2D,x:number,y:number):void{
         const buffer:HTMLCanvasElement = this.tiles.get(name);
