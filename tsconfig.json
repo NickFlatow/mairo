@@ -33,6 +33,7 @@
 	  "noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
 	  "noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
 	  "outFile": "./js/mario.js",
+	// "outDir": "./js",
 	  "lib": [
 		"dom",
 		"es2018"
@@ -43,7 +44,10 @@
 	"node_modules"
   ],
   "files": [
-    "src/main.ts"
+	"src/loaders.ts",
+    "src/main.ts",
+    "src/SpriteSheet.ts",
+	"interfaces/interfaces.ts"
   ],
   "types": [
 
