@@ -45,11 +45,15 @@
   ],
   "files": [
 	"src/Compositor.ts",
+	"src/entities.ts",
+	"src/Entity.ts",
 	"src/layers.ts",
 	"src/loaders.ts",
     "src/main.ts",
+	"src/math.ts",
 	"src/sprites.ts",
     "src/SpriteSheet.ts",
+	"src/Timer.ts",
 	"interfaces/interfaces.ts"
   ],
   "types": [

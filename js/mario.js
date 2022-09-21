@@ -9,9 +9,34 @@ class Compositor {
     }
     draw(context) {
         //draws a layer on a context -- all it does
+        //methods are defined in layers.ts
+        //methods are added in main.ts(background and sprites)
         this.layers.forEach(LayerDrawMethod => {
             LayerDrawMethod(context);
         });
+    }
+}
+function createMario() {
+    return loadMarioSprite().then(marioSprite => {
+        const mario = new Entity();
+        mario.draw = function drawMario(context) {
+            // let arr = ['walk-1','walk-2','walk-3'];
+            marioSprite.draw('idle', context, this.pos.x, this.pos.y);
+        };
+        mario.update = function update(deltaTime) {
+            this.pos.x += this.velocity.x * deltaTime;
+            this.pos.y += this.velocity.y * deltaTime;
+        };
+        return mario;
+    });
+}
+// const koopa = new Entity();
+// koopa.pos.set(250,240-56);
+class Entity {
+    constructor() {
+        this.pos = new Vec2(0, 0);
+        this.velocity = new Vec2(0, 0);
+        this.walkCycleIndex = 0;
     }
 }
 //span the height and width of canvas size defined in index.html
@@ -45,6 +70,11 @@ function createBackground(backgrounds, sprites) {
         context.drawImage(buffer, 0, 0);
     };
 }
+function createSpriteLayer(entity) {
+    return function drawSpriteLayer(context) {
+        entity.draw(context);
+    };
+}
 function loadImage(url) {
     return new Promise(resolve => {
         const image = new Image();
@@ -63,57 +93,53 @@ async function loadLevel(name) {
 }
 const canvas = document.getElementById('screen');
 const context = canvas.getContext('2d');
-function createSpriteLayer(sprite, pos) {
-    return function drawSpriteLayer(context) {
-        for (let i = 0; i < 500; i++) {
-            sprite.draw('idle', context, pos.x + i * 16, pos.y);
-        }
-    };
-}
 //load level and sprites in parallel -- do not wait for backgroundsprites to finish before starting loadlevel
 //but do not continue until all have finished loading
 Promise.all([
     loadKoopaSprite(),
-    loadMarioSprite(),
+    createMario(),
     loadBackgroundSprites(),
     loadLevel('1-1')
-]).then(([koopaSprite, marioSprite, backgroundSpriteTiles, level]) => {
-    const pos = {
-        x: -8000,
-        y: 0
-    };
-    const koopapos = {
-        x: 250,
-        y: 240 - 56
-    };
-    //creat class to call draw methods on background layers
+]).then(([koopaSprite, mario, backgroundSpriteTiles, level]) => {
+    const gravity = 30;
+    mario.pos.set(0, 240 - 48);
+    mario.velocity.set(200, -600);
+    //create class to call draw methods on background layers
     const comp = new Compositor();
-    //create buffers for Tiles to draw as backgrounds(this way we can just draw once) -- then every update method we just replace the tiles from buffer like on line 81
+    //create buffers for Tiles to draw as full background(this way we can just draw once) -- then every update method we just replace the tiles from buffer
     const background = createBackground(level.backgrounds, backgroundSpriteTiles);
-    const sprites = createSpriteLayer(marioSprite, pos);
-    const koopa = createSpriteLayer(koopaSprite, koopapos);
-    //add method to call buffer for draw to comp
+    const sprites = createSpriteLayer(mario);
+    //add methods to draw from buffer in  comp
     comp.layers.push(background);
     comp.layers.push(sprites);
-    comp.layers.push(koopa);
-    function update() {
-        //draw backgrounds
+    // comp.layers.push(koopa);
+    const timer = new Timer(1 / 60); //frame length
+    timer.update = function update(deltaTime) {
+        // draw backgrounds
         comp.draw(context);
-        // context.drawImage(backgroundBuffer,0,0);
-        // marioSprite.draw('idle',context,pos.x,pos.y);
-        // koopaSprite.draw('idle',context,32,240-56);
-        pos.x += 1;
-        // pos.y += 2;
-        koopapos.x -= 1;
-        requestAnimationFrame(update);
-    }
-    update();
+        mario.update(deltaTime);
+        // console.log(mario.pos);
+        mario.velocity.y += gravity;
+    };
+    timer.start();
 });
+class Vec2 {
+    constructor(x, y) {
+        this.set(x, y);
+    }
+    set(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
 function loadMarioSprite() {
     return loadImage('./src/img/sprites.png').then(image => {
         const sprites = new SpriteSheet(image, 16, 16);
         console.log("image", image);
         sprites.define('idle', 0, 88, 16, 16);
+        sprites.define('walk-1', 16, 88, 16, 16);
+        sprites.define('walk-2', 32, 88, 16, 16);
+        sprites.define('walk-3', 48, 88, 16, 16);
         return sprites;
     });
 }
@@ -166,5 +192,31 @@ class SpriteSheet {
     drawTile(name, context, x, y) {
         this.draw(name, context, x * this.width, y * this.height);
     }
+}
+class Timer {
+    constructor(deltaTime = 1 / 60) {
+        // const deltaTime = 1/60;
+        let accumulatedTime = 0;
+        let lastTime = 0;
+        this.updateProxy = (time) => {
+            //accumlatedTime and delta time to get the same results for macheines with different refresh rate; Also to control fps different parts of the game if needed
+            //and consistancey with movement and jumps
+            accumulatedTime += (time - lastTime) / 1000;
+            while (accumulatedTime > deltaTime) {
+                this.update(deltaTime);
+                accumulatedTime -= deltaTime;
+            }
+            lastTime = time;
+            this.enqueue();
+        };
+    }
+    enqueue() {
+        requestAnimationFrame(this.updateProxy);
+    }
+    start() {
+        this.enqueue();
+    }
+    update(_deltaTime) { }
+    updateProxy(_time) { }
 }
 //# sourceMappingURL=mario.js.map

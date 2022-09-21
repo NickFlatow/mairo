@@ -9,6 +9,8 @@ class Compositor {
     }
     draw(context:CanvasRenderingContext2D){
         //draws a layer on a context -- all it does
+        //methods are defined in layers.ts
+        //methods are added in main.ts(background and sprites)
         this.layers.forEach(LayerDrawMethod => {
             LayerDrawMethod(context)
         })

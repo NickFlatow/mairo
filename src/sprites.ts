@@ -3,6 +3,9 @@ function loadMarioSprite(){
         const sprites = new SpriteSheet(image,16,16);
         console.log("image",image);
         sprites.define('idle',0,88,16,16);
+        sprites.define('walk-1',16,88,16,16);
+        sprites.define('walk-2',32,88,16,16);
+        sprites.define('walk-3',48,88,16,16);
         return sprites;
     });
 }

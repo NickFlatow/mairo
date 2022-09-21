@@ -1,4 +1,3 @@
-
 //span the height and width of canvas size defined in index.html
 //x1,x2,y1,y2 is defined in levels json file -- ranges
 function drawBackground(background:background,context:CanvasRenderingContext2D,sprites:SpriteSheet){
@@ -35,3 +34,10 @@ function createBackground(backgrounds:background[],sprites:SpriteSheet){
         context.drawImage(buffer,0,0);
     }
 }
+
+function createSpriteLayer(entity:Entity){
+    return function drawSpriteLayer(context:CanvasRenderingContext2D){
+        entity.draw(context);
+    }
+}
+
