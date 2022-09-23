@@ -47,6 +47,7 @@
 	"src/Compositor.ts",
 	"src/entities.ts",
 	"src/Entity.ts",
+	"src/KeyboardState.ts",
 	"src/layers.ts",
 	"src/loaders.ts",
     "src/main.ts",
@@ -54,7 +55,10 @@
 	"src/sprites.ts",
     "src/SpriteSheet.ts",
 	"src/Timer.ts",
-	"interfaces/interfaces.ts"
+	"interfaces/interfaces.ts",
+	"src/traits/Velocity.ts",
+	"src/traits/Jump.ts"
+	
   ],
   "types": [
 

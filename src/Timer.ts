@@ -5,8 +5,8 @@ class Timer {
         let lastTime = 0;
         
         this.updateProxy = (time:number) => {
-            //accumlatedTime and delta time to get the same results for macheines with different refresh rate; Also to control fps different parts of the game if needed
-            //and consistancey with movement and jumps
+            //accumlatedTime and delta time to get the same results for macheines with different refresh rate for consistancey with movement and jumps; 
+            //Also to control fps different parts of the game if needed 
             accumulatedTime += (time - lastTime) /1000;
            
             while (accumulatedTime > deltaTime){

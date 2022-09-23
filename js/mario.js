@@ -19,24 +19,82 @@ class Compositor {
 function createMario() {
     return loadMarioSprite().then(marioSprite => {
         const mario = new Entity();
+        mario.addTrait(new Velocity());
+        mario.addTrait(new Jump());
         mario.draw = function drawMario(context) {
             // let arr = ['walk-1','walk-2','walk-3'];
             marioSprite.draw('idle', context, this.pos.x, this.pos.y);
-        };
-        mario.update = function update(deltaTime) {
-            this.pos.x += this.velocity.x * deltaTime;
-            this.pos.y += this.velocity.y * deltaTime;
         };
         return mario;
     });
 }
 // const koopa = new Entity();
 // koopa.pos.set(250,240-56);
+class Trait {
+    constructor(name) {
+        this.name = name;
+    }
+    update(_entity, _deltaTime) {
+        console.warn("Unhandled update call in trait");
+    }
+}
+//traits are added in entites.ts
 class Entity {
     constructor() {
         this.pos = new Vec2(0, 0);
         this.velocity = new Vec2(0, 0);
-        this.walkCycleIndex = 0;
+        this.traits = [];
+    }
+    // abstract update(deltaTime:number):void
+    addTrait(trait) {
+        this.traits.push(trait);
+        this[trait.NAME] = trait;
+    }
+    update(deltaTime) {
+        this.traits.forEach(trait => {
+            trait.update(this, deltaTime);
+        });
+    }
+}
+const PRESSED = 1;
+const RELEASED = 0;
+class KeyboardState {
+    constructor() {
+        // Holds the current state of a given key
+        this.keyStates = new Map();
+        // Holds the callback functions for a key code 
+        this.keyMap = new Map();
+    }
+    addMapping(key, callback) {
+        this.keyMap.set(key, callback);
+    }
+    handleEvent(event) {
+        //key is property of KeyboarEvent
+        const { key } = event;
+        if (!this.keyMap.has(key)) {
+            //Did not have key mapped
+            return;
+        }
+        //if we are here we know we have the key mapped
+        //prevent event from happening in browser F5 refresh, pagedown moves pagedown etc...(none of this will now happen)
+        event.preventDefault();
+        //is keyState up or down
+        const keyState = event.type === 'keydown' ? PRESSED : RELEASED;
+        if (this.keyStates.get(key) === keyState) {
+            return;
+        }
+        this.keyStates.set(key, keyState);
+        //calls call back funciton and gives keyState as arguemtn
+        this.keyMap.get(key)(keyState);
+    }
+    listenTo(window) {
+        //add keyup and keydown to window listener
+        ['keyup', 'keydown'].forEach(eventName => {
+            window.addEventListener(eventName, event => {
+                // console.log(event);
+                this.handleEvent(event);
+            });
+        });
     }
 }
 //span the height and width of canvas size defined in index.html
@@ -93,6 +151,9 @@ async function loadLevel(name) {
 }
 const canvas = document.getElementById('screen');
 const context = canvas.getContext('2d');
+// function test():void{
+//     console.log("testing callback fucntion!!!");
+// }
 //load level and sprites in parallel -- do not wait for backgroundsprites to finish before starting loadlevel
 //but do not continue until all have finished loading
 Promise.all([
@@ -101,9 +162,19 @@ Promise.all([
     loadBackgroundSprites(),
     loadLevel('1-1')
 ]).then(([koopaSprite, mario, backgroundSpriteTiles, level]) => {
-    const gravity = 30;
+    const gravity = 2000;
     mario.pos.set(0, 240 - 48);
     mario.velocity.set(200, -600);
+    let input = new KeyboardState();
+    input.addMapping("ArrowUp", keyState => {
+        if (keyState) {
+            mario.jump.start();
+        }
+        else {
+            mario.jump.cancel();
+        }
+    });
+    input.listenTo(window);
     //create class to call draw methods on background layers
     const comp = new Compositor();
     //create buffers for Tiles to draw as full background(this way we can just draw once) -- then every update method we just replace the tiles from buffer
@@ -113,13 +184,13 @@ Promise.all([
     comp.layers.push(background);
     comp.layers.push(sprites);
     // comp.layers.push(koopa);
-    const timer = new Timer(1 / 60); //frame length
+    const timer = new Timer(1 / 60); // 1/60 is frame length
     timer.update = function update(deltaTime) {
         // draw backgrounds
-        comp.draw(context);
         mario.update(deltaTime);
+        comp.draw(context);
         // console.log(mario.pos);
-        mario.velocity.y += gravity;
+        mario.velocity.y += gravity * deltaTime;
     };
     timer.start();
 });
@@ -199,8 +270,8 @@ class Timer {
         let accumulatedTime = 0;
         let lastTime = 0;
         this.updateProxy = (time) => {
-            //accumlatedTime and delta time to get the same results for macheines with different refresh rate; Also to control fps different parts of the game if needed
-            //and consistancey with movement and jumps
+            //accumlatedTime and delta time to get the same results for macheines with different refresh rate for consistancey with movement and jumps; 
+            //Also to control fps different parts of the game if needed 
             accumulatedTime += (time - lastTime) / 1000;
             while (accumulatedTime > deltaTime) {
                 this.update(deltaTime);
@@ -218,5 +289,36 @@ class Timer {
     }
     update(_deltaTime) { }
     updateProxy(_time) { }
+}
+class Velocity extends Trait {
+    constructor() {
+        super('velocity');
+    }
+    update(entity, deltaTime) {
+        entity.pos.x += entity.velocity.x * deltaTime;
+        entity.pos.y += entity.velocity.y * deltaTime;
+    }
+}
+class Jump extends Trait {
+    constructor() {
+        super('jump');
+        //how long we can hold the button
+        this.duration = 0.5;
+        this.velocity = 200;
+        //are we currently jumping
+        this.engageTime = 0;
+    }
+    update(entity, deltaTime) {
+        if (this.engageTime > 0) {
+            entity.velocity.y = -this.velocity;
+            this.engageTime -= deltaTime;
+        }
+    }
+    start() {
+        this.engageTime = this.duration;
+    }
+    cancel() {
+        this.engageTime = 0;
+    }
 }
 //# sourceMappingURL=mario.js.map
