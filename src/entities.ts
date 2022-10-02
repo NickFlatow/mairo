@@ -1,4 +1,10 @@
-function createMario():Promise<Entity>{
+import { loadMarioSprite } from "./sprites.js";
+import { Entity } from "./Entity.js";
+import { Velocity} from "./traits/Velocity.js";
+import { Jump } from "./traits/Jump.js";
+
+
+export function createMario():Promise<Entity>{
     return loadMarioSprite().then(marioSprite =>{
         const mario = new Entity();
 

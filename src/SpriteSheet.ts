@@ -1,7 +1,7 @@
 /**
  * Methods to crop subset of image(sprite) from spritesheet and render the selected sprite on to canvas
  */
-class SpriteSheet {
+export class SpriteSheet {
     image:CanvasImageSource;
     width:number;
     height:number;

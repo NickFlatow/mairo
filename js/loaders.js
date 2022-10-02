@@ -1,6 +1,5 @@
 // import {level}
-
-export function loadImage(url:string):Promise<HTMLImageElement>{
+export function loadImage(url) {
     return new Promise(resolve => {
         const image = new Image();
         image.addEventListener('load', () => {
@@ -10,10 +9,9 @@ export function loadImage(url:string):Promise<HTMLImageElement>{
         image.src = url;
     });
 }
-export async function loadLevel(name:string):Promise<level>{
+export async function loadLevel(name) {
     return fetch(`./src/levels/${name}.json`)
-    .then(r => r.json());
-
+        .then(r => r.json());
     // .then(json => new Promise(resolve => setTimeout(resolve,3000,json)))
     // })
 }

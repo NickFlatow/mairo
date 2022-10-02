@@ -1,4 +1,7 @@
-class Trait {
+import { Vec2 } from "./math.js";
+import { Jump } from "./traits/Jump.js";
+
+export class Trait {
     name:string
     constructor(name:string){
         this.name = name;
@@ -11,30 +14,32 @@ class Trait {
 //traits are added in entites.ts
 
 
-abstract class Entity{
+export class Entity{
     pos:Vec2;
-    velocity:Vec2;
+    vel:Vec2;
     traits:Trait[];
+    jump:Jump;
 
     constructor(){
         this.pos = new Vec2(0,0);
-        this.velocity = new Vec2(0,0);
-
+        this.vel = new Vec2(0,0);
         this.traits = []
     }
 
-    abstract draw(context:CanvasRenderingContext2D):void
+    draw(_context:CanvasRenderingContext2D):void{}
     // abstract update(deltaTime:number):void
 
     addTrait(trait:Trait){
         this.traits.push(trait);
-        this[trait.NAME] = trait;
+        this[trait.name] = trait;
     }
-
+ 
     update(deltaTime:number):void{
         this.traits.forEach(trait => {
             trait.update(this,deltaTime);
         });
     }
+    // start(){}
+    // cancel(){}
 
 }

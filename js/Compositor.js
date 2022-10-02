@@ -3,16 +3,15 @@
  */
 //loops over all backgound layers and draws them
 export class Compositor {
-    layers:{(context:CanvasRenderingContext2D):void}[]
-    constructor(){
+    constructor() {
         this.layers = [];
     }
-    draw(context:CanvasRenderingContext2D){
+    draw(context) {
         //draws a layer on a context -- all it does
         //methods are defined in layers.ts
         //methods are added in main.ts(background and sprites)
         this.layers.forEach(LayerDrawMethod => {
-            LayerDrawMethod(context)
-        })
+            LayerDrawMethod(context);
+        });
     }
 }

@@ -1,4 +1,7 @@
-function loadMarioSprite(){
+import { SpriteSheet } from "./SpriteSheet.js";
+import { loadImage } from "./loaders.js";
+
+export function loadMarioSprite(){
     return loadImage('./src/img/sprites.png').then(image =>{
         const sprites = new SpriteSheet(image,16,16);
         console.log("image",image);
@@ -9,7 +12,7 @@ function loadMarioSprite(){
         return sprites;
     });
 }
-function loadKoopaSprite(){
+export function loadKoopaSprite(){
     return loadImage('./src/img/sprites.png').then(image =>{
         const sprites = new SpriteSheet(image,16,24);
         console.log("image",image);
@@ -17,7 +20,7 @@ function loadKoopaSprite(){
         return sprites;
     });
 }
-function loadBackgroundSprites(){
+export function loadBackgroundSprites(){
     return loadImage('./src/img/tiles.png').then(image =>{
         const sprites = new SpriteSheet(image,16,16);
         console.log("image",image);

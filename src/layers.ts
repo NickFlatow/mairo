@@ -1,6 +1,9 @@
+import { SpriteSheet } from "./SpriteSheet.js";
+import { Entity } from "./Entity.js";
+
 //span the height and width of canvas size defined in index.html
 //x1,x2,y1,y2 is defined in levels json file -- ranges
-function drawBackground(background:background,context:CanvasRenderingContext2D,sprites:SpriteSheet){
+export function drawBackground(background:background,context:CanvasRenderingContext2D,sprites:SpriteSheet){
     background.ranges.forEach(([x1,x2,y1,y2]) => {
 
         for (let x = x1; x < x2;  ++x){
@@ -20,7 +23,7 @@ function drawBackground(background:background,context:CanvasRenderingContext2D,s
  * @returns fucntion to draw background layers
  */
 
-function createBackground(backgrounds:background[],sprites:SpriteSheet){
+export function createBackground(backgrounds:background[],sprites:SpriteSheet){
     const buffer = document.createElement('canvas'); 
     buffer.width = 256;
     buffer.height = 240;
@@ -35,7 +38,7 @@ function createBackground(backgrounds:background[],sprites:SpriteSheet){
     }
 }
 
-function createSpriteLayer(entity:Entity){
+export function createSpriteLayer(entity:Entity){
     return function drawSpriteLayer(context:CanvasRenderingContext2D){
         entity.draw(context);
     }
