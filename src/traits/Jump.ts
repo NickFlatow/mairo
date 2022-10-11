@@ -21,11 +21,11 @@ export class Jump extends Trait {
     }
     start(){
         this.engageTime = this.duration;
-        console.log("started Jump");
+        // console.log("started Jump");
     }
     cancel(){
         this.engageTime = 0;
-        console.log("canceled jump");
+        // console.log("canceled jump");
     }
     
 }

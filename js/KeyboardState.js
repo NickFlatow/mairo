@@ -26,6 +26,7 @@ export class KeyboardState {
             return;
         }
         this.keyStates.set(key, keyState);
+        // console.log(this.keyMap);
         //calls call back funciton and gives keyState as arguemtn
         this.keyMap.get(key)(keyState);
     }

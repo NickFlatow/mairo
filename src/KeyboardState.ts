@@ -16,8 +16,6 @@ export class KeyboardState {
         this.keyMap.set(key,callback);
     }
     handleEvent(event:KeyboardEvent):boolean|void{
-
-        
         //key is property of KeyboarEvent
         const {key} = event;
 
@@ -40,7 +38,7 @@ export class KeyboardState {
         }
         
         this.keyStates.set(key,keyState);
-
+        // console.log(this.keyMap);
         //calls call back funciton and gives keyState as arguemtn
         this.keyMap.get(key)(keyState);
 

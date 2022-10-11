@@ -1,14 +1,3 @@
-//span the height and width of canvas size defined in index.html
-//x1,x2,y1,y2 is defined in levels json file -- ranges
-export function drawBackground(background, context, sprites) {
-    background.ranges.forEach(([x1, x2, y1, y2]) => {
-        for (let x = x1; x < x2; ++x) {
-            for (let y = y1; y < y2; ++y) {
-                sprites.drawTile(background.tile, context, x, y);
-            }
-        }
-    });
-}
 /**
  * 1.) reates buffer for background the size of cavase
  * 2.) creates buffer for each tiled background -- right now sky and ground
@@ -17,13 +6,13 @@ export function drawBackground(background, context, sprites) {
  * @param sprites
  * @returns fucntion to draw background layers
  */
-export function createBackground(backgrounds, sprites) {
+export function createBackground(level, sprites) {
     const buffer = document.createElement('canvas');
     buffer.width = 256;
     buffer.height = 240;
-    backgrounds.forEach(background => {
-        //draws on backgroundbuffer instead of directly to context(which shows on screeen)
-        drawBackground(background, buffer.getContext('2d'), sprites);
+    const context = buffer.getContext('2d');
+    level.tiles.forEach((tile, x, y) => {
+        sprites.drawTile(tile.name, context, x, y);
     });
     return function drawBackgroundLayer(context) {
         context.drawImage(buffer, 0, 0);
@@ -31,6 +20,38 @@ export function createBackground(backgrounds, sprites) {
 }
 export function createSpriteLayer(entity) {
     return function drawSpriteLayer(context) {
-        entity.draw(context);
+        entity.forEach(entity => {
+            entity.draw(context);
+        });
+    };
+}
+export function createCollisionLayer(level) {
+    const resolvedTiles = [];
+    const tileResolver = level.tileCollider.tiles;
+    const tileSize = tileResolver.tileSize;
+    //save original function
+    const getByIndexOriginal = tileResolver.getByIndex;
+    //override orignial function
+    tileResolver.getByIndex = function getByIndexFake(x, y) {
+        //space do stuff while spying on the original function
+        // console.log("test");
+        resolvedTiles.push({ x, y });
+        //.call sends "this" to the function "this" is tileResolver here 
+        return getByIndexOriginal.call(tileResolver, x, y);
+    };
+    return function drawCollision(context) {
+        context.strokeStyle = 'blue';
+        resolvedTiles.forEach(({ x, y }) => {
+            context.beginPath();
+            context.rect(x * tileSize, y * tileSize, tileSize, tileSize);
+            context.stroke();
+        });
+        context.strokeStyle = 'red';
+        level.entites.forEach(entity => {
+            context.beginPath();
+            context.rect(entity.pos.x, entity.pos.y, entity.size.x, entity.size.y);
+            context.stroke();
+        });
+        resolvedTiles.length = 0;
     };
 }

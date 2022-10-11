@@ -1,5 +1,6 @@
 import { Vec2 } from "./math.js";
 import { Jump } from "./traits/Jump.js";
+import { Run } from "./traits/Run.js"
 
 export class Trait {
     name:string
@@ -17,12 +18,15 @@ export class Trait {
 export class Entity{
     pos:Vec2;
     vel:Vec2;
+    size:Vec2;
     traits:Trait[];
     jump:Jump;
+    run:Run;
 
     constructor(){
         this.pos = new Vec2(0,0);
         this.vel = new Vec2(0,0);
+        this.size = new Vec2(0,0);
         this.traits = []
     }
 
@@ -39,7 +43,4 @@ export class Entity{
             trait.update(this,deltaTime);
         });
     }
-    // start(){}
-    // cancel(){}
-
 }
